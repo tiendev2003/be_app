@@ -33,7 +33,7 @@ const router = express.Router();
  *       201:
  *         description: User registered successfully
  */
-router.post('/register', upload.array('otherpic', 5), register);
+router.post('/register', upload.array('otherpic', 7), register);
 
 /**
  * @swagger

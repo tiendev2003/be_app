@@ -25,7 +25,8 @@ exports.getListLikeMe = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const userData = await User.findOne({ uid });
+    const userData = await User.findOne({ where: { id: uid } });
+
     if (!userData) {
       throw new UnauthorizedError("Invalid user");
     }
@@ -129,7 +130,7 @@ exports.toggleLike = async (req, res, next) => {
         profile_id: profile_id,
         action: action,
       });
-      const user = await User.findOne({ uid });
+      const user = await User.findOne({ where: { id: uid } });
       const name = user.name;
       const settings = await Setting.findOne();
       const notificationData = {
@@ -165,7 +166,7 @@ exports.mapInfores = async (req, res, next) => {
     if (!uid || !lats || !longs || !radius_search) {
       throw new BadRequestError("Invalid input");
     }
-    const userData = await User.findOne({ uid });
+    const userData =await User.findOne({ where: { id: uid } });
     if (!userData) {
       throw new UnauthorizedError("Invalid user");
     }
@@ -224,7 +225,7 @@ exports.matchUser = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: { uid },
       attributes: [
@@ -284,7 +285,7 @@ exports.getPassedUser = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: { uid, action: "UNLIKE" },
       attributes: [
@@ -378,7 +379,7 @@ exports.getListFavorite = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     const likedProfiles = await Action.findAll({
       where: {
         uid: uid,
@@ -480,7 +481,7 @@ exports.blockUser = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user =await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: {
         uid: uid,
@@ -555,7 +556,7 @@ exports.filterUser = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: {
         uid: uid,
@@ -639,7 +640,8 @@ exports.getHomePage = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ id:uid });
+    console.log("uid", uid);
+    const user = await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: {
         uid: uid,
@@ -824,7 +826,7 @@ exports.getProfileInfores = async (req, res, next) => {
     if (!uid || !profile_id || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     const otherProfile = await User.findByPk(profile_id);
 
     const birthDate = new Date(otherProfile.birth_date);

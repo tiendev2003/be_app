@@ -3,8 +3,9 @@ const Plan = require("../models/planModel.js");
 const { BadRequestError } = require("../utils/customErrors.js");
 const { hashPassword } = require("../utils/hashPassword.js");
 const Setting = require("../models/settingModel.js");
-const { processFileUploads } = require("../utils/fileUpload.js");
-
+const { processFileUploads, deleteFile } = require("../utils/fileUpload.js");
+const path = require("path");
+const fs = require("fs");
 exports.forgotPassword = async (req, res, next) => {
   const { mobile, password, ccode } = req.body;
   try {
@@ -149,7 +150,8 @@ exports.deleteAccount = async (req, res, next) => {
     if (!uid) {
       throw new BadRequestError("uid is required");
     }
-    const user = await User.findOne({ where: { uid } });
+    const user = await User.findOne({ where: { id: uid } });
+
     if (!user) {
       throw new BadRequestError("User not found");
     }
@@ -165,7 +167,7 @@ exports.referUser = async (req, res, next) => {
     if (!uid) {
       throw new BadRequestError("uid is required");
     }
-    const user = await User.findOne({ where: { uid } });
+    const user = await User.findOne({ where: { id: uid } });
     if (!user) {
       throw new BadRequestError("User not found");
     }
@@ -187,6 +189,8 @@ exports.uploadProfileImage = async (req, res, next) => {
     if (!uid || !img) {
       throw new BadRequestError("Missing required fields");
     }
+    console.log(img);
+    console.log("uid :", uid);
     const decodedImg = img
       .replace(/^data:image\/png;base64,/, "")
       .replace(/ /g, "+");
@@ -195,13 +199,21 @@ exports.uploadProfileImage = async (req, res, next) => {
     const fullPath = path.join(__dirname, "..", filePath);
     fs.writeFileSync(fullPath, data);
 
-    await User.update({ profile_pic: filePath }, { where: { id: uid } });
+    // find user and update profile image by uid
+    const user = await User.findOne({ where: { id: uid } });
+    deleteFile(user.profile_pic);
+    user.profile_pic = filePath;
+    await user.save();
 
-    const updatedUser = await User.findOne({ uid });
+    const updatedUser = await User.findOne({ where: { id: uid } });
     res.success("Profile image uploaded successfully", {
       UserLogin: updatedUser,
     });
   } catch (error) {
+    if (error.code === "LIMIT_FILE_SIZE") {
+      error.statusCode = 413;
+      error.message = "File size is too large";
+    }
     next(error);
   }
 };

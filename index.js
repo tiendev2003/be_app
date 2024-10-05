@@ -45,47 +45,9 @@ app.use("/api/language", languageRoutes);
 app.use("/api/relation", relationRoutes);
 app.use("/api/religion", religionRoutes);
 app.use("/api/setting", settingRoutes);
+ 
 
-const options = {
-  definition: {
-    openapi: "3.1.0",
-    info: {
-      title: "Go Meet",
-      version: "0.1.0",
-      description:
-        "This is document for app dating",
-      license: {
-        name: "MIT",
-        url: "https://spdx.org/licenses/MIT.html",
-      },
-      contact: {
-        name: "LogRocket",
-        url: "https://tiendev.id.vn",
-        email: "trancongtien406@gmail.com",
-      },
-    },
-    servers: [
-      {
-        url: "http://localhost:8000/api",
-      },
-      {
-        url: "http://gomeet.tiendev.id.vn/api",
-      }
-      
-    ],
-  },
-  apis: ["./routes/*.js"],
-};
-
-const specs = swaggerJsdoc(options);
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(specs, {
-    explorer: true,
-     
-  } )
-);
+ 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });

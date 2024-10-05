@@ -4,6 +4,7 @@ const path = require("path");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     let uploadPath = "uploads/";
+    console.log(req.baseUrl);
     if (req.baseUrl.includes("interest")) {
       uploadPath = path.join(uploadPath, "interest");
     }
@@ -16,7 +17,7 @@ const storage = multer.diskStorage({
     if (req.baseUrl.includes("setting")) {
       uploadPath = path.join(uploadPath, "setting");
     }
-    if (req.baseUrl.includes("auth")) {
+    if (req.baseUrl.includes("api/auth")) {
       uploadPath = path.join(uploadPath, "profile");
     }
     cb(null, uploadPath);
@@ -30,7 +31,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }
 });
 
 module.exports = {

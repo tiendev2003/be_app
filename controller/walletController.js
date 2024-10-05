@@ -8,7 +8,7 @@ exports.walletReport = async (req, res, next) => {
     if (!uid) {
       throw new BadRequestError("uid is required");
     }
-    const user = await User.findOne({ uid });
+    const user = await User.findOne({ where: { id: uid } });
     if (!user) {
       throw new BadRequestError("User not found");
     }
