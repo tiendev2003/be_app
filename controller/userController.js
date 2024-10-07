@@ -214,7 +214,7 @@ exports.uploadProfileImage = async (req, res, next) => {
     const user = await User.findOne({ where: { id: uid } });
     deleteFile(user.profile_pic);
     if (req.file) {
-      user.profile_pic = req.file.path;
+      user.profile_pic = "\\"+req.file.path;
     }
     await user.save();
 
