@@ -20,6 +20,9 @@ const storage = multer.diskStorage({
     if (req.baseUrl.includes("api/auth")) {
       uploadPath = path.join(uploadPath, "profile");
     }
+    if (req.baseUrl.includes("api/user")) {
+      uploadPath = path.join(uploadPath, "profile");
+    }
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {

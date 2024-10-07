@@ -3,9 +3,14 @@ const Plan = require("../models/planModel.js");
 const { BadRequestError } = require("../utils/customErrors.js");
 const { hashPassword } = require("../utils/hashPassword.js");
 const Setting = require("../models/settingModel.js");
-const { processFileUploads, deleteFile } = require("../utils/fileUpload.js");
+const {
+  processFileUploads,
+  deleteFile,
+  deleteFiles,
+} = require("../utils/fileUpload.js");
 const path = require("path");
 const fs = require("fs");
+const { Op } = require("sequelize");
 exports.forgotPassword = async (req, res, next) => {
   const { mobile, password, ccode } = req.body;
   try {
@@ -88,8 +93,20 @@ exports.updateUser = async (req, res, next) => {
       imlist,
       size,
     } = req.body;
+    console.log(req.files)
+   
     if (!name || !email || !mobile || !password || !ccode) {
+      if (req.files) {
+        deleteFiles(req.files);
+      }
       throw new BadRequestError("Missing required fields");
+    }
+    const existUser = await User.findOne({ where: { id: uid } });
+    if (!existUser) {
+      if (req.files) {
+        deleteFiles(req.files);
+      }
+      throw new BadRequestError("User not found");
     }
     const checkMob = await User.findOne({
       where: { mobile, id: { [Op.ne]: uid } },
@@ -98,15 +115,19 @@ exports.updateUser = async (req, res, next) => {
       where: { email, id: { [Op.ne]: uid } },
     });
     if (checkMob) {
+      if (req.files) {
+        deleteFiles(req.files);
+      }
       throw new BadRequestError("Mobile number already exists");
     }
     if (checkEmail) {
+      if (req.files) {
+        deleteFiles(req.files);
+      }
       throw new BadRequestError("Email already exists");
     }
     let uploadedFiles = [];
-    if (!req.files || req.files.length === 0) {
-      throw new BadRequestError("No files uploaded");
-    }
+
     if (req.files.length > 0) {
       uploadedFiles = processFileUploads(req.files);
     }
@@ -128,7 +149,7 @@ exports.updateUser = async (req, res, next) => {
         interest,
         language,
         religion,
-        other_pic: uploadedFiles.join("$;"),
+        other_pic: uploadedFiles.length > 0 ? uploadedFiles.join("$;") : existUser.other_pic,
         profile_bio,
         height,
       },
@@ -185,24 +206,16 @@ exports.referUser = async (req, res, next) => {
 
 exports.uploadProfileImage = async (req, res, next) => {
   try {
-    const { uid, img } = req.body;
-    if (!uid || !img) {
+    const { uid } = req.body;
+    if (!uid) {
       throw new BadRequestError("Missing required fields");
     }
-    console.log(img);
-    console.log("uid :", uid);
-    const decodedImg = img
-      .replace(/^data:image\/png;base64,/, "")
-      .replace(/ /g, "+");
-    const data = Buffer.from(decodedImg, "base64");
-    const filePath = `uploads/profile/${Date.now()}.png`;
-    const fullPath = path.join(__dirname, "..", filePath);
-    fs.writeFileSync(fullPath, data);
 
-    // find user and update profile image by uid
     const user = await User.findOne({ where: { id: uid } });
     deleteFile(user.profile_pic);
-    user.profile_pic = filePath;
+    if (req.file) {
+      user.profile_pic = req.file.path;
+    }
     await user.save();
 
     const updatedUser = await User.findOne({ where: { id: uid } });
