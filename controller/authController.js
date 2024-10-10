@@ -84,7 +84,7 @@ exports.register = async (req, res, next) => {
       if (req.files.length > 0) {
         uploadedFiles = processFileUploads(req.files);
       }
-      const newUser = await User.create({
+      let newUser = await User.create({
         name,
         email,
         mobile,
@@ -113,6 +113,8 @@ exports.register = async (req, res, next) => {
         status: "Credit",
         amt: setting.scredit,
       });
+      // thay dđoôiổi hash password sang plain password truoc khi tra ve client
+      newUser.password = password;
 
       res.sucess("User created successfully", {
         UserLogin: newUser,
@@ -128,7 +130,7 @@ exports.register = async (req, res, next) => {
       if (req.files.length > 0) {
         uploadedFiles = processFileUploads(req.files);
       }
-      const newUser = await User.create({
+      let newUser = await User.create({
         name,
         email,
         mobile,
@@ -150,6 +152,9 @@ exports.register = async (req, res, next) => {
         other_pic: uploadedFiles.join("$;"),
       });
 
+      // thay dđoôiổi hash password sang plain password truoc khi tra ve client
+      newUser.password = password;
+
       res.success("Success", {
         UserLogin: newUser,
         currency: setting.currency,
@@ -169,7 +174,7 @@ exports.login = async (req, res, next) => {
       throw new BadRequestError("Missing required fields");
     }
     //  login with mobile or email
-    const user = await User.findOne({
+    let user = await User.findOne({
       where: {
         [Sequelize.Op.or]: [
           { email: mobile },
@@ -186,6 +191,9 @@ exports.login = async (req, res, next) => {
     if (!isPasswordMatch) {
       throw new BadRequestError("Invalid password");
     }
+
+    // thay dđoôiổi hash password sang plain password truoc khi tra ve client
+    user.password = password;
     res.success("Login successful", {
       UserLogin: user,
     });
@@ -199,13 +207,16 @@ exports.loginSocial = async (req, res, next) => {
     if (!email) {
       throw new BadRequestError("Missing required fields");
     }
-    const user = await User.findOne({ where: { email } });
+    let user = await User.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundError("User not found");
     }
     if (user.status !== 1) {
       throw new BadRequestError("User is not active");
     }
+    // chuyeêển hash password sang plain password truoc khi tra ve client sau khi layáy dđuôôc user
+    user.password = "";
+
     res.success("Login successful", {
       UserLogin: user,
     });

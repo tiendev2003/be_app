@@ -3,6 +3,6 @@ const { getPlanPurchaseHistory } = require('../controller/planPurchaseController
  
 const router = express.Router();
 
-router.get('/plan-purchase-history', getPlanPurchaseHistory);
+router.post('/plan-purchase-history', getPlanPurchaseHistory);
 
 module.exports = router;

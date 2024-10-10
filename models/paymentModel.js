@@ -7,7 +7,7 @@ const PaymentList = sequelize.define("Payments", {
   img: { type: DataTypes.STRING, allowNull: false },
   attributes: { type: DataTypes.STRING, allowNull: false },
   subtitle: { type: DataTypes.STRING, defaultValue: null },
-  p_show: { type: DataTypes.INTEGER, allowNull: false },
+  p_show: { type: DataTypes.STRING, allowNull: false },
   status: { type: DataTypes.STRING, defaultValue: "1" },
 });
 

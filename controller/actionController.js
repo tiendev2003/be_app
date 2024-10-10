@@ -637,11 +637,13 @@ exports.filterUser = async (req, res, next) => {
 exports.getHomePage = async (req, res, next) => {
   try {
     const { uid, lats, longs } = req.body;
+    console.log(req.body);
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    console.log("uid", uid);
     const user = await User.findOne({ where: { id: uid } });
+    console.log("uid", user);
+
     const action = await Action.findAll({
       where: {
         uid: uid,

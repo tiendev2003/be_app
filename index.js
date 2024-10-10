@@ -13,6 +13,7 @@ const settingRoutes = require("./routes/settingRoutes.js");
 const actionRoutes = require("./routes/actionRoutes.js");
 const planPurchaseRoutes = require("./routes/planPurchaseRoutes.js");
 const walletRoutes = require("./routes/walletRoutes.js");
+const paymentRoutes = require("./routes/paymentRoutes.js");
 const notificationRoutes = require("./routes/notificationRoutes.js");
 const { default: helmet } = require("helmet");
 const responseFormatter = require("./middlewares/responseFormatter.js");
@@ -45,6 +46,7 @@ app.use("/api/language", languageRoutes);
 app.use("/api/relation", relationRoutes);
 app.use("/api/religion", religionRoutes);
 app.use("/api/setting", settingRoutes);
+app.use("/api/payment", paymentRoutes);
  
 
  

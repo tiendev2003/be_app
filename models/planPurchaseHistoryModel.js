@@ -6,7 +6,7 @@ const PlanPurchaseHistory = sequelize.define("PlanPurchaseHistory", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     planId: { type: DataTypes.STRING, allowNull: false },
     p_name: { type: DataTypes.STRING, allowNull: false },
-    t_date: { type: DataTypes.STRING, allowNull: false },
+    t_date: { type: DataTypes.DATE, defaultValue: new Date() },
     amount: { type: DataTypes.DECIMAL, allowNull: false },
     day: { type: DataTypes.STRING, allowNull: false },
     plan_title: { type: DataTypes.STRING, allowNull: false },
