@@ -21,6 +21,7 @@ const Language = require("../models/languageModel.js");
 
 exports.getListLikeMe = async (req, res, next) => {
   const { uid, lats, longs } = req.body;
+  console.log(req.body);
   try {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
@@ -30,75 +31,66 @@ exports.getListLikeMe = async (req, res, next) => {
     if (!userData) {
       throw new UnauthorizedError("Invalid user");
     }
-    const actionData = await Action.findAll({
+    console.log(userData);
+    const likedProfiles = await Action.findAll({
       where: {
+        action: "LIKE",
+        action: { [Op.ne]: "block" },
         profile_id: uid,
-        action: {
-          [Op.in]: "LIKE",
-          [Op.ne]: "BLOCK",
-        },
       },
-      attributes: [
-        [
-          sequelize.fn("GROUP_CONCAT", sequelize.col("uid")),
-          "liked_profile_id",
-        ],
-      ],
-      raw: true,
+      attributes: ["uid"],
     });
-    if (!actionData[0].liked_profile_id) {
-      throw new UnauthorizedError("No liked profile");
+    if (!likedProfiles.length) {
+      res.success("No liked profile!!!" );
     }
-    const likedProfileId = actionData[0].liked_profile_id.split(",");
+
+    const likedProfileIds = likedProfiles.map((p) => p.uid);
     const otherProfiles = await User.findAll({
-      where: {
-        id: {
-          [Op.in]: likedProfileId,
-        },
-      },
+      where: { id: likedProfileIds },
     });
-    const users = [];
-    for (const row of otherProfiles) {
-      const checkLike = await Action.findAll({
+    let users = [];
+
+    for (let otherUser of otherProfiles) {
+      const hasLike = await Action.count({
         where: {
-          profile_id: row.id,
+          profile_id: otherUser.id,
           uid: uid,
-          action: {
-            [Op.or]: ["LIKE", "UNLIKE"],
-            [Op.ne]: "BLOCK",
-          },
+          action: { [Op.or]: ["LIKE", "UNLIKE"] },
         },
       });
 
-      if (checkLike.length === 0) {
-        const actions = await Action.findAll({
-          where: {
-            profile_id: row.id,
-            action: "BLOCK",
-          },
-        });
+      if (hasLike) continue;
 
-        if (actions.length === 0) {
-          const birthdateObj = DateTime.fromISO(row.birth_date);
-          const currentDateObj = DateTime.now();
-          const ageInterval = currentDateObj.diff(birthdateObj, "years").years;
+      const isBlocked = await Action.count({
+        where: {
+          action: "BLOCK",
+          profile_id: otherUser.id,
+        },
+      });
 
-          const matchRatio = calculateMatchRatio(userData, row);
-          const distance = calculateDistance(lats, longs, row.lats, row.longs);
+      if (isBlocked) continue;
 
-          users.push({
-            profile_id: row.id,
-            profile_name: row.name,
-            profile_bio: row.profile_bio,
-            is_verify: row.is_verify,
-            profile_age: Math.floor(ageInterval),
-            profile_distance: `${distance} KM`,
-            profile_images: row.other_pic.split("$;"),
-            match_ratio: matchRatio,
-          });
-        }
-      }
+      const age = calculateAge(otherUser.birth_date);
+      const matchRatio = calculateMatchRatio(user, otherUser);
+      const distance = calculateDistance(
+        lats,
+        longs,
+        otherUser.lats,
+        otherUser.longs
+      );
+
+      users.push({
+        profile_id: otherUser.id,
+        profile_name: otherUser.name,
+        profile_bio: otherUser.profile_bio,
+        is_verify: otherUser.is_verify,
+        profile_age: age,
+        profile_distance: `${distance} KM`,
+        profile_images: otherUser.other_pic.split("$;"),
+        match_ratio: matchRatio,
+      });
     }
+
     res.success("Home Data Get Successfully!!!", {
       likemelist: users,
     });
@@ -166,7 +158,7 @@ exports.mapInfores = async (req, res, next) => {
     if (!uid || !lats || !longs || !radius_search) {
       throw new BadRequestError("Invalid input");
     }
-    const userData =await User.findOne({ where: { id: uid } });
+    const userData = await User.findOne({ where: { id: uid } });
     if (!userData) {
       throw new UnauthorizedError("Invalid user");
     }
@@ -335,7 +327,8 @@ exports.getPassedUser = async (req, res, next) => {
         passedlist: userProfiles,
       });
     } else {
-      throw new UnauthorizedError("No liked profile");
+      res.success("No liked profile!!!" );
+     
     }
   } catch (error) {
     next(error);
@@ -481,7 +474,7 @@ exports.blockUser = async (req, res, next) => {
     if (!uid || !lats || !longs) {
       throw new BadRequestError("Invalid input");
     }
-    const user =await User.findOne({ where: { id: uid } });
+    const user = await User.findOne({ where: { id: uid } });
     const action = await Action.findAll({
       where: {
         uid: uid,
@@ -530,7 +523,7 @@ exports.blockUser = async (req, res, next) => {
         blocklist: userProfiles,
       });
     } else {
-      throw new UnauthorizedError("No liked profile");
+      res.success("No liked profile!!!" );
     }
   } catch (error) {
     next(error);
@@ -768,7 +761,7 @@ exports.getHomePage = async (req, res, next) => {
         : {
             plan_title: history.plan_title,
             plan_start_date: history.start_date,
-            plan_end_date: history.expire_date,
+            plan_end_date: history.expiry_date,
             trans_id: history.trans_id,
             p_name: history.p_name,
             amount: history.amount,
