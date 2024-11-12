@@ -2,7 +2,7 @@ const { Op, fn, col, literal } = require("sequelize");
 const Action = require("../models/actionModel.js");
 const User = require("../models/userModel.js");
 const { DateTime } = require("luxon");
-
+ 
 const {
   BadRequestError,
   UnauthorizedError,
@@ -71,9 +71,9 @@ exports.getListLikeMe = async (req, res, next) => {
       });
 
       if (isBlocked) continue;
-
-      const age = calculateAge(otherUser.birth_date);
-      const matchRatio = calculateMatchRatio(userData, otherUser);
+      const birthDate = new Date(profile.birth_date);
+      const age = new Date().getFullYear() - birthDate.getFullYear();
+       const matchRatio = calculateMatchRatio(userData, otherUser);
       const distance = calculateDistance(
         lats,
         longs,
