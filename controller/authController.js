@@ -231,3 +231,27 @@ exports.checkMobile = async (req, res, next) => {
     next(error);
   }
 };
+
+// login admin
+exports.loginAdmin = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    if (!email || !password) {
+      throw new BadRequestError("Missing required fields");
+    }
+    if (email !== "admin@gmail.com") {
+      throw new BadRequestError("Invalid email");
+    }
+    if (password !== "admin") {
+      throw new BadRequestError("Invalid password");
+    }
+    res.success("Login successful", {
+      user: {
+        email,
+        password,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};

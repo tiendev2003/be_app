@@ -1,5 +1,5 @@
 const express = require('express');
-const { register, login, loginSocial, checkMobile } = require('../controller/authController');
+const { register, login, loginSocial, checkMobile, loginAdmin } = require('../controller/authController');
 const { upload } = require('../config/uploadConfig');
 
 const router = express.Router();
@@ -98,5 +98,6 @@ router.post('/login-social', loginSocial);
  *         description: Mobile number checked successfully
  */
 router.post('/check-mobile', checkMobile);
+router.post('/login-admin', loginAdmin);
 
 module.exports = router;

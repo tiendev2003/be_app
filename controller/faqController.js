@@ -25,7 +25,6 @@ exports.createFaq = async (req, res, next) => {
 };
 
 // update faq
-
 exports.updateFaq = async (req, res, next) => {
   const { id } = req.params;
   const { question, answer,status } = req.body;
