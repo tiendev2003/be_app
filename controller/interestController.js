@@ -13,6 +13,28 @@ exports.getAllInterest = async (req, res, next) => {
     next(error);
   }
 };
+exports.getInterestByAdmin = async (req, res, next) => {
+  console.log("getInterestByAdmin");
+  try {
+    const interests = await Interest.findAll();
+    res.success("Success", { interestlist: interests });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.getInterestById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const interest = await Interest.findOne({ where: { id } });
+    if (!interest) {
+      return res.error("Interest not found", 404);
+    }
+    res.success("Success", { interestlist: interest });
+  } catch (error) {
+    next(error);
+  }
+}
 
 // create interest
 exports.createInterest = async (req, res, next) => {

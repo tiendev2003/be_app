@@ -12,6 +12,27 @@ exports.getAllLanguage = async (req, res, next) => {
   }
 };
 
+exports.getLanguageByAdmin = async (req, res, next) => {
+  try {
+    const languages = await Language.findAll();
+    res.success("Success", { languagelist: languages });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.getLanguageById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const language = await Language.findOne({ where: { id } });
+    if (!language) {
+      return res.error("Language not found", 404);
+    }
+    res.success("Success", { languagelist: language });
+  } catch (error) {
+    next(error);
+  }
+}
 // create language
 exports.createLanguage = async (req, res, next) => {
   const { title } = req.body;

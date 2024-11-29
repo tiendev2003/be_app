@@ -6,6 +6,7 @@ const {
   updatePayment,
   deletePayment,
   getPaymentReturn,
+  getPaymentByAdmin,
 } = require("../controller/paymentController.js");
 const { upload } = require("../config/uploadConfig.js");
 
@@ -13,6 +14,8 @@ const router = express.Router();
 
 router.get("/return", getPaymentReturn);
 router.get("/all", getPayments);
+router.get("/all-admin", getPaymentByAdmin);
+
 router.get("/:id", getPaymentById);
 router.post("/create", upload.single("image"), createPayment);
 router.put("/update", upload.single("image"), updatePayment);

@@ -4,6 +4,8 @@ const {
   createRelation,
   updateRelation,
   deleteRelation,
+  getAllByAdmin,
+  getRelationById,
 } = require("../controller/relationController.js");
 
 const router = express.Router();
@@ -18,50 +20,10 @@ const router = express.Router();
  *         description: A list of relations
  */
 router.get("/all", getAllRelation);
-
-/**
- * @swagger
- * /relations/create:
- *   post:
- *     summary: Create a new relation
- *     responses:
- *       201:
- *         description: Relation created
- */
-router.post("/create", createRelation);
-
-/**
- * @swagger
- * /relation/update/{id}:
- *   put:
- *     summary: Update an existing relation
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Relation updated
- */
+router.get("/all-admin", getAllByAdmin);
 router.put("/update/:id", updateRelation);
-
-/**
- * @swagger
- * /relation/delete/{id}:
- *   delete:
- *     summary: Delete a relation
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Relation deleted
- */
+router.post("/create", createRelation);
+router.get("/:id", getRelationById);
 router.delete("/delete/:id", deleteRelation);
 
 module.exports = router;

@@ -4,7 +4,7 @@ const { deleteFile } = require("../utils/fileUpload.js");
 
 exports.createPayment = async (req, res, next) => {
   try {
-    const { title, img, attributes, subtitle, p_show, status } = req.body;
+    const { title,   attributes, subtitle, p_show, status } = req.body;
     if (!title || !attributes || !p_show || !status) {
       if (!title || !attributes || !p_show || !status) {
         deleteFile(req.file);
@@ -40,6 +40,14 @@ exports.getPayments = async (req, res, next) => {
     next(error);
   }
 };
+exports.getPaymentByAdmin = async (req, res, next) => {
+  try {
+    const payments = await PaymentList.findAll();
+    res.success("Payment list", { paymentdata: payments });
+  } catch (error) {
+    next(error);
+  }
+}
 
 exports.updatePayment = async (req, res, next) => {
   try {

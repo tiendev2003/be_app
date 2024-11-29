@@ -13,6 +13,28 @@ exports.getAllFaq = async (req, res, next) => {
   }
 };
 
+exports.getFaqByAdmin = async (req, res, next) => {
+  try {
+    const faqs = await Faq.findAll();
+    res.success("Success", { FaqData: faqs });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.getFaqById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const faq = await Faq.findOne({ where: { id } });
+    if (!faq) {
+      return res.error("Faq not found", 404);
+    }
+    res.success("Success", { FaqData: faq });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // create faq
 exports.createFaq = async (req, res, next) => {
   const { question, answer } = req.body;

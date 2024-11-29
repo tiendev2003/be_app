@@ -92,8 +92,8 @@ exports.updateUser = async (req, res, next) => {
       imlist,
       size,
     } = req.body;
-    console.log(req.files)
-   
+    console.log(req.files);
+
     if (!name || !email || !mobile || !password || !ccode) {
       if (req.files) {
         deleteFiles(req.files);
@@ -148,7 +148,10 @@ exports.updateUser = async (req, res, next) => {
         interest,
         language,
         religion,
-        other_pic: uploadedFiles.length > 0 ? uploadedFiles.join("$;") : existUser.other_pic,
+        other_pic:
+          uploadedFiles.length > 0
+            ? uploadedFiles.join("$;")
+            : existUser.other_pic,
         profile_bio,
         height,
       },
@@ -213,7 +216,7 @@ exports.uploadProfileImage = async (req, res, next) => {
     const user = await User.findOne({ where: { id: uid } });
     deleteFile(user.profile_pic);
     if (req.file) {
-      user.profile_pic = "\\"+req.file.path;
+      user.profile_pic = "\\" + req.file.path;
     }
     await user.save();
 
@@ -272,3 +275,33 @@ exports.indentifyProfile = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.findAll();
+    res.success("All users", {
+      data: users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getProfileInfores = async (req, res, next) => {
+  try {
+    const uid = req.params.id;
+    if (!uid) {
+      throw new BadRequestError("Missing required fields");
+    }
+    const user = await User.findOne({ where: { id: uid } });
+    if (!user) {
+      throw new BadRequestError("User not found");
+    }
+    return res.success("Profile info", {
+      data:user,
+    });
+  }
+  catch (error) {
+    next(error);
+  }
+}

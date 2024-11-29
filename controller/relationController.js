@@ -11,6 +11,27 @@ exports.getAllRelation = async (req, res, next) => {
   }
 };
 
+exports.getAllByAdmin = async (req, res, next) => {
+  try {
+    const relations = await Relation.findAll();
+    res.success("Success", { goallist: relations });
+  } catch (error) {
+    next(error);
+  }
+}
+exports.getRelationById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const relation = await Relation.findOne({ where: { id } });
+    if (!relation) {
+      return res.error("Relation not found", 404);
+    }
+    res.success("Success", { goallist: relation });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // create relation
 exports.createRelation = async (req, res, next) => {
   const { title, subtitle} = req.body;

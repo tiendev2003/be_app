@@ -11,6 +11,29 @@ exports.getAllPage = async (req, res, next) => {
   }
 };
 
+exports.getPlanByAdmin = async (req, res, next) => {
+  try {
+    const plan = await Plan.findAll();
+    res.success("Success", { PlanData: plan });
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.getPlanById = async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const plan = await Plan.findOne({ where: { id } });
+    if (!plan) {
+      return res.error("Plan not found", 404);
+    }
+    res.success("Success", { PlanData: plan });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 // create plan
 exports.createPlan = async (req, res, next) => {
   
@@ -42,6 +65,8 @@ exports.createPlan = async (req, res, next) => {
     next(error);
   }
 };
+
+
 
 // update plan
 exports.updatePlan = async (req, res, next) => {

@@ -20,13 +20,30 @@ const responseFormatter = require("./middlewares/responseFormatter.js");
 require("dotenv").config();
 const cors = require("cors");
 const errorHandler = require("./middlewares/errorHandler.js");
-const swaggerJsdoc = require("swagger-jsdoc"),
-  swaggerUi = require("swagger-ui-express");
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 app.use(helmet());
-app.use(cors()); // Use the cors middleware
+app.use(cors({
+  origin: '*',  // Địa chỉ frontend của bạn
+  methods: 'GET,POST,PUT,DELETE',   // Các phương thức HTTP được phép
+  allowedHeaders: 'Content-Type ,Authorization, Origin, X-Requested-With, Accept',  // Các header được phép
+}));
+
+
 app.use(express.json());
+app.use((req, res, next) => {
+  // Kiểm tra xem tài nguyên có phải là cross-origin không
+  if (req.get('Origin') && req.get('Origin') !== 'http://localhost:5173') {
+    // Nếu là cross-origin, thêm header Cross-Origin-Resource-Policy: cross-origin
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  } else {
+    // Nếu là same-origin, thêm header Cross-Origin-Resource-Policy: same-site
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site');
+  }
+  
+  next();
+});
 app.use("/uploads", express.static("uploads"));
 
 app.use(responseFormatter); // Sử dụng middleware responseFormatter
