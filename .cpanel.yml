@@ -1,0 +1,12 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYMENT_SOURCE=$PWD
+    - export NODE_ENV=production
+    - echo "Bắt đầu quá trình cài đặt..."
+    - npm install
+    - echo "Xóa cache cũ nếu có..."
+    - npm cache clean --force
+    - echo "Khởi động lại ứng dụng Node.js..."
+    - /opt/cpanel/ea-nodejs10/bin/npm stop || true
+    - /opt/cpanel/ea-nodejs10/bin/npm start
