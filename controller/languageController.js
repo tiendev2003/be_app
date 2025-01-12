@@ -61,7 +61,7 @@ exports.createLanguage = async (req, res, next) => {
 // update language
 exports.updateLanguage = async (req, res, next) => {
   const { id } = req.params;
-  const { title } = req.body;
+  const { title ,status} = req.body;
   try {
     const language = await Language.findOne({ where: { id } });
     if (!language) {
@@ -74,6 +74,7 @@ exports.updateLanguage = async (req, res, next) => {
     if (req.file) {
       language.img = req.file.path;
     }
+    language.status = status || language.status;
     await language.save();
     res.success("Success", { languagelist: language });
   } catch (error) {
